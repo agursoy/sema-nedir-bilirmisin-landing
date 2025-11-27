@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Tüm body’ye Helvetica / Arial fontu uygula */
+body * {
+	font-family: "Helvetica", Helvetica, Arial, sans-serif;
+}
+
+@theme {
+	--color-snb-white: #ffffff;
+	--color-snb-black: #000000;
+	--font-weight-extrablack: 1000;
+}
