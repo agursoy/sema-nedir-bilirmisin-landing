@@ -1,8 +1,10 @@
 import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
-import { createTimeline } from "animejs";
+import { createTimeline, utils, splitText, stagger } from "animejs";
 
 export function useScrollTimeline(scenes) {
-	const lerpFactor = 0.15;
+	const snapThreshold = 0.15; // %15
+	const snapForce = 0.08; // ne kadar güçlü çeksin
+	const lerpFactor = 0.2;
 	const containerSelector = ".scroll-container";
 
 	const currentIndex = ref(0);
@@ -30,19 +32,47 @@ export function useScrollTimeline(scenes) {
 	};
 
 	const smoothUpdate = () => {
-		// Lerp progress
+		const delta = Math.abs(targetProgress - currentProgress.value);
+
+		if (delta < 0.0001) {
+			rafId = requestAnimationFrame(smoothUpdate);
+			return; // Çok küçük değişimler için hesaplama yapma
+		}
+
+		// 1️⃣ Normal lerp
 		currentProgress.value +=
 			(targetProgress - currentProgress.value) * lerpFactor;
 
 		const sceneStep = 1 / scenes.length;
 
-		const index = Math.floor(currentProgress.value / sceneStep);
+		// 2️⃣ Scene index
+		const rawIndex = currentProgress.value / sceneStep;
+		const index = Math.floor(rawIndex);
+
 		currentIndex.value = Math.min(scenes.length - 1, Math.max(index, 0));
 
-		const local =
+		// 3️⃣ Local progress (0–1)
+		let local =
 			(currentProgress.value - currentIndex.value * sceneStep) / sceneStep;
 
-		// Seek timeline
+		// 4️⃣ SNAP LOGIC ⭐
+		if (local > 1 - snapThreshold) {
+			// Sahnenin SONUNA yapış
+			const snapTarget = (currentIndex.value + 1) * sceneStep;
+
+			currentProgress.value += (snapTarget - currentProgress.value) * snapForce;
+
+			local = 1;
+		} else if (local < snapThreshold) {
+			// Sahnenin BAŞINA yapış
+			const snapTarget = currentIndex.value * sceneStep;
+
+			currentProgress.value += (snapTarget - currentProgress.value) * snapForce;
+
+			local = 0;
+		}
+
+		// 5️⃣ Timeline seek
 		timeline.seek(local * timeline.duration);
 
 		rafId = requestAnimationFrame(smoothUpdate);
@@ -64,16 +94,31 @@ export function useScrollTimeline(scenes) {
 			autoplay: false,
 		});
 
+		const headerSplitted = splitText(`#header-${index}`, {
+			chars: true,
+		});
+
+		const paragraphSplitted = splitText(`#paragraph-${index}`, {
+			chars: true,
+		});
+
 		// Sahneye özel animasyon
 		timeline.add(
-			[`.header-${index}`, `.paragraph-${index}`],
+			[headerSplitted.chars, paragraphSplitted.chars],
 			{
 				duration: 10,
 				opacity: [1, 0],
 				easing: "inOutBounce",
-				y: "-200px",
+				x: {
+					to: () => utils.random(-3, 3) + "rem",
+					duration: () => utils.random(150, 500),
+				},
+				y: () => utils.random(-5, 5) + "rem",
+				rotate: () => utils.random(-180, 180),
+				duration: () => utils.random(200, 750),
+				ease: "outCirc",
 			},
-			0
+			stagger(5, { from: "random" })
 		);
 	};
 

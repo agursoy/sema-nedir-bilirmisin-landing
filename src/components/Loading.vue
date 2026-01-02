@@ -1,21 +1,28 @@
 <template>
 	<div class="h-screen w-screen">
 		<div
+			id="loading-image"
 			ref="image"
-			class="bg-[url(/loading-bg.webp)] bg-cover bg-center w-56 h-72 rounded-[12px] fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-xs hover:bg-neutral-secondary-medium"
+			:style="{
+				width: `${Math.round(videoFrameW / 2)}px`,
+				height: `${Math.round(videoFrameH / 2)}px`,
+			}"
+			class="border-1 border-[#eceee2]/50 bg-[url(/frames/frame_001.webp)] bg-cover bg-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-xs hover:bg-neutral-secondary-medium"
 		></div>
 
 		<div
 			ref="title"
-			class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl font-extrablack"
+			class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-extrablack"
 		>
-			<div class="text-black md:text-black rounded-[12px]">
-				Sema Nedir Bilirmisin?
+			<div
+				class="text-snb-text-default rounded-[12px] w-96 text-8xl whitespace-wrap ml-12"
+			>
+				sema nedir bilir misin?
 			</div>
 		</div>
 	</div>
 	<div
-		class="bg-gray-900/70 px-4 py-1 rounded-full text-1xl font-clean text-snb-white fixed bottom-6 right-5"
+		class="bg-gray-900/70 px-4 py-1 rounded-full text-1xl font-clean text-snb-text-default fixed bottom-6 right-5"
 		ref="loadingText"
 	>
 		<div class="flex flex-row items-center justify-center gap-1">
@@ -37,12 +44,14 @@ import {
 import { onMounted, ref, nextTick } from "vue";
 
 export default {
-	setup() {
+	props: ["videoFrameW", "videoFrameH"],
+	setup(props) {
 		const iris = ref(null);
 		const title = ref(null);
 		const image = ref(null);
 
 		const loadingText = ref(null);
+		const { videoFrameW, videoFrameH } = props;
 
 		onMounted(async () => {
 			const { chars } = splitText(title.value, {
@@ -53,7 +62,7 @@ export default {
 			createTimeline({ delay: 2500 })
 				.add(title.value, {
 					ease: "inOut(1.9)",
-					x: "18vw",
+					x: "22vw",
 				})
 				.add(chars, {
 					opacity: [0, 1],
@@ -96,7 +105,15 @@ export default {
 			image,
 			title,
 			loadingText,
+			videoFrameW,
+			videoFrameH,
 		};
 	},
 };
 </script>
+<style>
+#loading-image {
+	padding: 10px;
+	background-color: #eceee2;
+}
+</style>

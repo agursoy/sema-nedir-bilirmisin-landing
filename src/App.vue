@@ -1,8 +1,8 @@
 <template>
-	<div class="bg-gradient-to-br from-[#f9fafb] via-[#f3f4f6] to-[#e5e7eb]">
+	<div class="bg-snb-bg-default">
 		<Transition>
 			<div v-show="loading">
-				<loading />
+				<loading :video-frame-w="videoFrameW" :video-frame-h="videoFrameH" />
 			</div>
 		</Transition>
 		<Transition>
@@ -10,43 +10,47 @@
 				v-show="!loading"
 				class="scroll-container h-screen overflow-y-scroll"
 			>
-				<div class="h-[1000vh]">
-					<div
-						ref="bgRef"
-						class="fixed top-0 left-0 w-full h-full pointer-events-none"
-						:style="currentStyle"
-					></div>
-
-					<div class="fixed top-50 left-50 z-10">
-						<div class="flex flex-row flex-wrap gap-12">
+				<div
+					ref="bgRef"
+					class="fixed top-0 left-0 w-full h-full pointer-events-none z-30"
+					:style="currentStyle"
+				></div>
+				<div class="relative h-[1000vh]">
+					<div class="sticky top-1/2 -translate-y-1/2 w-ful">
+						<div class="flex flex-row flex-wrap gap-12 justify-center">
 							<div id="video">
 								<video-frame-player
+									:canvas_w="videoFrameW"
+									:canvas_h="videoFrameH"
 									ref="videoFramePlayer"
 									@preload-completed="loading = false"
 								/>
 							</div>
-							<div id="text">
-								<h1
-									:class="`header-${currentIndex}`"
-									class="text-9xl text-black font-clean"
-								>
-									{{ currentHeader }}
-								</h1>
-								<h2
-									:class="`paragraph-${currentIndex}`"
-									class="text-4xl text-black font-clean"
-								>
-									{{ currentParagraph }}
-								</h2>
+							<div id="text" class="w-96 relative -mt-96 md:-mt-0 md:ml-0 p-5">
+								<div class="relative">
+									<h1
+										:id="`header-${currentIndex}`"
+										:class="`header-${currentIndex}`"
+										class="text-lg md:text-5xl text-snb-text-default font-clean"
+									>
+										{{ currentHeader }}
+									</h1>
+									<h2
+										:id="`paragraph-${currentIndex}`"
+										:class="`paragraph-${currentIndex}`"
+										class="text-md md:text-xl text-snb-text-default font-clean pt-6"
+									>
+										{{ currentParagraph }}
+									</h2>
+								</div>
+								<div class="absolute bottom-5 flex flex-row items-center gap-3">
+									<span class="text-snb-text-default"
+										>Sayfayı kaydırmaya devam edin</span
+									>
+									<scroll-down-icon :width="'20'" />
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-
-				<div class="fixed bottom-3 right-3">
-					<div class="flex flex-row items-center gap-3">
-						<span>Sayfayı kaydırın</span>
-						<scroll-down-icon :width="'20'" />
 					</div>
 				</div>
 			</div>
@@ -70,22 +74,28 @@ export default {
 	},
 	setup() {
 		const videoFramePlayer = ref(null);
-		const loading = ref(true);
+		const loading = ref(false);
+
+		const videoFrameW = ref(720);
+		const videoFrameH = ref(405);
 
 		const scenes = [
 			{
-				header: "Scena 1",
-				paragraph: "First scena text",
+				header: "SEMA NEDİR BİLİR MİSİN?",
+				paragraph:
+					"Bilir misin sema nedir; 'Belâ' (Evet) sesini işitmek, Hakk'a ulaşıp, kendini kendinden kesmektir Bilir misin sema nedir; varlıktan habersiz olmak Mutlak fanilik içinde ebedilik zevkini tatmaktır",
 				style: {},
 			},
 			{
-				header: "Scene 2",
-				paragraph: "Second scene text",
+				header: "Sultan Veled Devri",
+				paragraph:
+					"İnsan yeryüzüne indirilmiştir. Dünya kaotik, renkli ve aldatıcıdır. Kalabalık caddeler, geçici sevinçler ve bitmeyen arayışlar arasında insan savrulur.",
 				style: {},
 			},
 			{
 				header: "Scene 3",
-				paragraph: "Third scene text",
+				paragraph:
+					"İnsan yeryüzüne indirilmiştir. Dünya kaotik, renkli ve aldatıcıdır. Kalabalık caddeler, geçici sevinçler ve bitmeyen arayışlar arasında insan savrulur.",
 				style: {},
 			},
 		];
@@ -112,6 +122,8 @@ export default {
 			currentHeader,
 			currentParagraph,
 			currentStyle,
+			videoFrameW,
+			videoFrameH,
 		};
 	},
 };
@@ -120,7 +132,7 @@ export default {
 <style>
 .v-enter-active,
 .v-leave-active {
-	transition: opacity 0.5s ease;
+	transition: opacity 3s ease;
 }
 
 .v-enter-from,

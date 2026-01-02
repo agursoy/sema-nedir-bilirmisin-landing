@@ -8,5 +8,7 @@ body * {
 @theme {
 	--color-snb-white: #ffffff;
 	--color-snb-black: #000000;
+	--color-snb-text-default: #eceee2;
+	--color-snb-bg-default: #202018;
 	--font-weight-extrablack: 1000;
 }
