@@ -43,12 +43,8 @@
 										{{ currentParagraph }}
 									</h2>
 								</div>
-								<div class="absolute bottom-5 flex flex-row items-center gap-3">
-									<span class="text-snb-text-default"
-										>Sayfayı kaydırmaya devam edin</span
-									>
-									<scroll-down-icon :width="'20'" />
-								</div>
+
+								<scroll-down-message-bar :isScrolling="isScrolling""></scroll-down-message-bar>
 							</div>
 						</div>
 					</div>
@@ -61,8 +57,8 @@
 <script>
 import { useScrollTimeline } from "./composables/useScrollTimeline.js";
 import VideoFramePlayer from "./components/VideoFramePlayer.vue";
+import ScrollDownMessageBar from "./components/ScrollDownMessageBar.vue";
 import Loading from "./components/Loading.vue";
-import ScrollDownIcon from "./components/ScrollDownIcon.vue";
 
 import { watch, ref } from "vue";
 
@@ -70,7 +66,7 @@ export default {
 	components: {
 		VideoFramePlayer,
 		Loading,
-		ScrollDownIcon,
+		ScrollDownMessageBar,
 	},
 	setup() {
 		const videoFramePlayer = ref(null);
@@ -78,6 +74,9 @@ export default {
 
 		const videoFrameW = ref(720);
 		const videoFrameH = ref(405);
+
+		let isScrollingTimerId;
+		const isScrolling = ref(false);
 
 		const scenes = [
 			{
@@ -109,10 +108,20 @@ export default {
 		} = useScrollTimeline(scenes);
 
 		watch(currentProgress, (val) => {
+			updateIsScrolling();
+
 			if (videoFramePlayer.value) {
 				videoFramePlayer.value.updateFrame(val);
 			}
 		});
+
+		const updateIsScrolling = () => {
+			isScrolling.value = true;
+			clearTimeout(isScrollingTimerId);
+			isScrollingTimerId = setTimeout(() => {
+				isScrolling.value = false;
+			}, 600);
+		};
 
 		return {
 			loading,
@@ -124,6 +133,7 @@ export default {
 			currentStyle,
 			videoFrameW,
 			videoFrameH,
+			isScrolling,
 		};
 	},
 };
