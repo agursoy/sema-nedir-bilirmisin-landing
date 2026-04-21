@@ -77,18 +77,11 @@ export function useScrollTimeline(scenes) {
 	};
 
 	const bindSceneAnimation = (index) => {
-		// Mevcut timeline'ı temizle
 		if (timeline) {
 			timeline.pause();
 			timeline = null;
 		}
 
-		// Yeni timeline oluştur
-		timeline = createTimeline({
-			autoplay: false,
-		});
-
-		// DOM elementlerini kontrol et
 		const headerEl = document.querySelector(`#header-${index}`);
 		const paragraphEl = document.querySelector(`#paragraph-${index}`);
 
@@ -97,11 +90,22 @@ export function useScrollTimeline(scenes) {
 			return;
 		}
 
+		headerEl.textContent = scenes[index].header;
+		paragraphEl.textContent = scenes[index].paragraph;
+
+		headerEl.removeAttribute("style");
+		paragraphEl.removeAttribute("style");
+
 		// GPU hints
 		headerEl.style.willChange = "transform, opacity";
 		paragraphEl.style.willChange = "transform, opacity";
 
-		// Split text yap
+		// Yeni timeline oluştur
+		timeline = createTimeline({
+			autoplay: false,
+		});
+
+		// Temiz metin üzerinde split text yap
 		const headerSplitted = splitText(`#header-${index}`, {
 			chars: true,
 		});
@@ -110,7 +114,7 @@ export function useScrollTimeline(scenes) {
 			chars: true,
 		});
 
-		// Header animasyonu
+		// Karakter dağılma animasyonu
 		timeline.add(
 			[headerSplitted.chars, paragraphSplitted.chars],
 			{
