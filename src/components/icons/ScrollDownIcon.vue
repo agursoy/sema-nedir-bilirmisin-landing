@@ -28,15 +28,12 @@
 </template>
 
 <script>
-import { ref } from "vue";
-
 export default {
-	setup(props) {
-		const width = ref(null);
-
-		return {
-			width,
-		};
+	props: {
+		width: {
+			type: String,
+			default: "20",
+		},
 	},
 };
 </script>

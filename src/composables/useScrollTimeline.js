@@ -119,7 +119,7 @@ export function useScrollTimeline(scenes) {
 				y: (el, i) => utils.random(-5, 5) + "rem",
 				rotate: (el, i) => utils.random(-180, 180),
 				duration: (el, i) => utils.random(200, 750),
-				easing: "outCirc",
+				ease: "outCirc",
 			},
 			stagger(5, { from: "random" })
 		);

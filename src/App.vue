@@ -16,7 +16,7 @@
 					:style="currentStyle"
 				></div>
 				<div class="relative h-[1000vh]">
-					<div class="sticky top-1/2 -translate-y-1/2 w-ful">
+					<div class="sticky top-1/2 -translate-y-1/2 w-full">
 						<div class="flex flex-row flex-wrap gap-12 justify-center">
 							<div id="video">
 								<video-frame-player
@@ -26,7 +26,7 @@
 									@preload-completed="loading = false"
 								/>
 							</div>
-							<div id="text" class="w-96 relative -mt-96 md:-mt-0 md:ml-0 p-5">
+							<div id="text" class="w-96 relative  md:-mt-0 md:ml-0 p-5">
 								<div class="relative">
 									<h1
 										:id="`header-${currentIndex}`"
@@ -44,7 +44,7 @@
 									</h2>
 								</div>
 
-								<scroll-down-message-bar :isScrolling="isScrolling""></scroll-down-message-bar>
+								<scroll-down-message-bar :isScrolling="isScrolling"></scroll-down-message-bar>
 							</div>
 						</div>
 					</div>
@@ -70,7 +70,7 @@ export default {
 	},
 	setup() {
 		const videoFramePlayer = ref(null);
-		const loading = ref(false);
+		const loading = ref(true);
 
 		const videoFrameW = ref(720);
 		const videoFrameH = ref(405);

@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 	<head>
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Vite + Vue</title>
+		<title>Sema Nedir Bilir Misin? — Sema Mukabelesi Deneyimi</title>
+		<meta
+			name="description"
+			content="Sema Nedir Bilir Misin? — İstanbul Meydan Meşkleri tarafından sunulan interaktif sema mukabelesi deneyimi."
+		/>
+		<meta property="og:title" content="Sema Nedir Bilir Misin?" />
+		<meta
+			property="og:description"
+			content="İstanbul Meydan Meşkleri tarafından sunulan interaktif sema mukabelesi deneyimi."
+		/>
+		<meta property="og:type" content="website" />
 		<link href="/src/style.css" rel="stylesheet" />
 	</head>
 	<body>
@@ -14,7 +24,7 @@
 			<div class="max-w-7xl mx-auto px-4">
 				<div class="flex items-center justify-between h-16">
 					<!-- Hamburger -->
-					<button id="menuBtn" class="md:hidden">
+					<button id="menuBtn" class="md:hidden" aria-label="Menüyü aç">
 						<svg
 							class="w-7 h-7 text-snb-text-default"
 							fill="none"
@@ -56,13 +66,21 @@
 			id="sideMenu"
 			class="fixed top-0 left-0 h-full w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50"
 		>
-			<div class="p-5 font-bold border-b">Menu</div>
+			<div class="p-5 font-bold border-b">Menü</div>
 
 			<nav class="flex flex-col gap-4 p-5">
-				<a href="#" class="text-snb-text-default transition">Home</a>
-				<a href="#" class="text-snb-text-default transition">Projects</a>
-				<a href="#" class="text-snb-text-default transition">About</a>
-				<a href="#" class="text-snb-text-default transition">Contact</a>
+				<a
+					href="https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm"
+					target="_blank"
+					class="text-snb-bg-default transition"
+					>Bilet Al</a
+				>
+				<a
+					href="https://www.meydanmeskleri.com/"
+					target="_blank"
+					class="text-snb-bg-default transition"
+					>Hakkımızda</a
+				>
 			</nav>
 		</aside>
 		<div id="app"></div>
@@ -72,15 +90,41 @@
 		>
 			<span
 				class="text-snb-text-default text-sm text-body sm:text-center hidden md:block"
-				>© 2025
+				>© <span id="footer-year"></span>
 				<a href="https://www.meydanmeskleri.com/" class="hover:underline"
 					>İstanbul Meydan Meşkleri</a
-				>. All Rights Reserved.
+				>. Tüm Hakları Saklıdır.
 			</span>
 			<ul
 				class="flex flex-wrap items-center mt-3 text-sm font-medium text-body sm:mt-0"
 			></ul>
 		</footer>
+
+		<script>
+			// Dynamic footer year
+			document.getElementById("footer-year").textContent =
+				new Date().getFullYear();
+
+			// Hamburger menu toggle
+			const menuBtn = document.getElementById("menuBtn");
+			const sideMenu = document.getElementById("sideMenu");
+			const overlay = document.getElementById("overlay");
+
+			function openMenu() {
+				sideMenu.classList.remove("-translate-x-full");
+				sideMenu.classList.add("translate-x-0");
+				overlay.classList.remove("hidden");
+			}
+
+			function closeMenu() {
+				sideMenu.classList.add("-translate-x-full");
+				sideMenu.classList.remove("translate-x-0");
+				overlay.classList.add("hidden");
+			}
+
+			menuBtn.addEventListener("click", openMenu);
+			overlay.addEventListener("click", closeMenu);
+		</script>
 
 		<script type="module" src="/src/main.js"></script>
 	</body>

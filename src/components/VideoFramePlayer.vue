@@ -1,7 +1,7 @@
 <template>
 	<div class="frame-player-container border-1 border-[#eceee2]/50">
 		<div class="left-column">
-			<canvas ref="canvas" class="video-canvas"></canvas>
+			<canvas ref="canvas" class="video-canvas w-full h-auto"></canvas>
 		</div>
 	</div>
 </template>
@@ -10,7 +10,7 @@
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 
 export default {
-	emit: ["preloadCompleted"],
+	emits: ["preload-completed"],
 	expose: ["updateFrame"],
 	props: ["canvas_w", "canvas_h"],
 	setup(props, { emit }) {
@@ -28,7 +28,7 @@ export default {
 		const images = [];
 		const loaded = new Array(TOTAL_FRAMES + 1).fill(false);
 
-		const progressBar = ref(null);
+
 
 		let lastRenderedFrame = -1;
 
@@ -108,17 +108,12 @@ export default {
 		function updateFrame(scrollPercent) {
 			const frameIndex = Math.min(
 				TOTAL_FRAMES,
-				Math.max(1, Math.floor(scrollPercent * TOTAL_FRAMES) + 1)
+				Math.max(1, Math.floor(scrollPercent * TOTAL_FRAMES) + 1),
 			);
 
 			if (frameIndex !== lastRenderedFrame) {
 				drawFrame(frameIndex);
 				lastRenderedFrame = frameIndex;
-			}
-
-			// progress bar
-			if (progressBar.value) {
-				progressBar.value.style.width = `${scrollPercent * 100}%`;
 			}
 		}
 
@@ -142,6 +137,11 @@ export default {
 			}, 6000);
 		});
 
+		onBeforeUnmount(() => {
+			document.body.style.overflow = "";
+			document.documentElement.style.overflow = "";
+		});
+
 		return {
 			canvas,
 			updateFrame,
@@ -161,45 +161,5 @@ export default {
 .video-canvas {
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 	background: #000;
-}
-
-.right-column {
-	position: sticky;
-	top: 120px;
-}
-
-.text-block {
-	max-width: 380px;
-	padding: 20px;
-	background: rgba(255, 255, 255, 0.02);
-	transition: all 0.3s ease-out;
-}
-
-.text-block h1 {
-	margin: 0 0 12px 0;
-	font-size: 24px;
-}
-
-.text-block p {
-	margin: 0;
-	line-height: 1.5;
-	color: #e6e6e6;
-}
-
-.scroll-progress {
-	position: fixed;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 3px;
-	background: rgba(255, 255, 255, 0.1);
-	z-index: 60;
-}
-
-.progress-bar {
-	height: 100%;
-	width: 0;
-	background: #fff;
-	transition: width 0.1s linear;
 }
 </style>
