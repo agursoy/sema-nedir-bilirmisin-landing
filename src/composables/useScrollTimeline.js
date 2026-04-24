@@ -2,11 +2,15 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from "vue";
 import { createTimeline, utils, splitText, stagger } from "animejs";
 
 export function useScrollTimeline(scenes) {
+	const isMobile =
+		/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+		window.innerWidth < 768;
+
 	const snapThreshold = 0.15;
 	const snapForce = 0.08;
-	const lerpFactor = 0.2;
+	const lerpFactor = isMobile ? 0.25 : 0.2;
 	const containerSelector = ".scroll-container";
-	const minDelta = 0.0001;
+	const minDelta = isMobile ? 0.0005 : 0.0001;
 
 	const currentIndex = ref(0);
 
@@ -23,18 +27,12 @@ export function useScrollTimeline(scenes) {
 	let targetProgress = 0;
 	let currentProgress = ref(0);
 	let rafId = null;
-	let scrollTimeout = null;
 
-	// Throttled scroll handler
+	// Scroll handler — doğrudan oku, throttle yerine rAF'a bırak
 	const onScroll = () => {
-		if (scrollTimeout) return;
-
-		scrollTimeout = setTimeout(() => {
-			scrollTimeout = null;
-			const maxScroll = container.scrollHeight - container.clientHeight;
-			const scrollY = container.scrollTop;
-			targetProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
-		}, 10);
+		const maxScroll = container.scrollHeight - container.clientHeight;
+		const scrollY = container.scrollTop;
+		targetProgress = maxScroll > 0 ? scrollY / maxScroll : 0;
 	};
 
 	const smoothUpdate = () => {
@@ -96,16 +94,16 @@ export function useScrollTimeline(scenes) {
 		headerEl.removeAttribute("style");
 		paragraphEl.removeAttribute("style");
 
-		// GPU hints
+		// GPU hints — mobilde sadece transform kullan (daha hafif)
 		headerEl.style.willChange = "transform, opacity";
 		paragraphEl.style.willChange = "transform, opacity";
+		headerEl.style.contain = "layout style";
+		paragraphEl.style.contain = "layout style";
 
-		// Yeni timeline oluştur
 		timeline = createTimeline({
 			autoplay: false,
 		});
 
-		// Temiz metin üzerinde split text yap
 		const headerSplitted = splitText(`#header-${index}`, {
 			chars: true,
 		});
@@ -114,21 +112,24 @@ export function useScrollTimeline(scenes) {
 			chars: true,
 		});
 
-		// Karakter dağılma animasyonu
+		// Mobilde daha hafif animasyon — daha az random hesaplama, daha küçük offset
+		const xRange = isMobile ? 2 : 3;
+		const yRange = isMobile ? 3 : 5;
+		const rotRange = isMobile ? 90 : 180;
+
 		timeline.add(
 			[headerSplitted.chars, paragraphSplitted.chars],
 			{
 				opacity: [1, 0],
-				x: (el, i) => utils.random(-3, 3) + "rem",
-				y: (el, i) => utils.random(-5, 5) + "rem",
-				rotate: (el, i) => utils.random(-180, 180),
+				x: (el, i) => utils.random(-xRange, xRange) + "rem",
+				y: (el, i) => utils.random(-yRange, yRange) + "rem",
+				rotate: (el, i) => utils.random(-rotRange, rotRange),
 				duration: (el, i) => utils.random(200, 750),
 				ease: "outCirc",
 			},
 			stagger(5, { from: "random" })
 		);
 
-		// Timeline'ı başa al
 		timeline.seek(0);
 	};
 
@@ -149,8 +150,6 @@ export function useScrollTimeline(scenes) {
 			return;
 		}
 
-		container.style.willChange = "scroll-position";
-
 		// İlk sahneyi hazırla
 		nextTick(() => {
 			bindSceneAnimation(0);
@@ -163,15 +162,10 @@ export function useScrollTimeline(scenes) {
 	onUnmounted(() => {
 		if (container) {
 			container.removeEventListener("scroll", onScroll);
-			container.style.willChange = "auto";
 		}
 
 		if (rafId) {
 			cancelAnimationFrame(rafId);
-		}
-
-		if (scrollTimeout) {
-			clearTimeout(scrollTimeout);
 		}
 
 		if (timeline) {

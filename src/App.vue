@@ -15,9 +15,11 @@
 					class="fixed top-0 left-0 w-full h-full pointer-events-none z-30"
 					:style="currentStyle"
 				></div>
-				<div class="relative h-[1000vh]">
+				<div class="relative" :class="scrollHeight">
 					<div class="sticky top-1/2 -translate-y-1/2 w-full">
-						<div class="flex flex-row flex-wrap gap-12 justify-center">
+						<div
+							class="flex flex-col md:flex-row flex-wrap gap-4 md:gap-12 justify-center items-center"
+						>
 							<div id="video">
 								<video-frame-player
 									:canvas_w="videoFrameW"
@@ -26,7 +28,10 @@
 									@preload-completed="loading = false"
 								/>
 							</div>
-							<div id="text" class="w-96 relative  md:-mt-0 md:ml-0 p-5">
+							<div
+								id="text"
+								class="w-full md:w-96 relative md:-mt-0 md:ml-0 p-5 contain-layout"
+							>
 								<div class="relative">
 									<h1
 										:id="`header-${currentIndex}`"
@@ -43,8 +48,9 @@
 										{{ currentParagraph }}
 									</h2>
 								</div>
-
-								<scroll-down-message-bar :isScrolling="isScrolling"></scroll-down-message-bar>
+								<scroll-down-message-bar
+									:isScrolling="isScrolling"
+								></scroll-down-message-bar>
 							</div>
 						</div>
 					</div>
@@ -72,8 +78,14 @@ export default {
 		const videoFramePlayer = ref(null);
 		const loading = ref(true);
 
-		const videoFrameW = ref(720);
-		const videoFrameH = ref(405);
+		// isMobile'ı hemen hesapla — computed/onMounted timing sorunu yaratmaz
+		const isMobile =
+			/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+			window.innerWidth < 768;
+
+		const videoFrameW = ref(isMobile ? 360 : 720);
+		const videoFrameH = ref(isMobile ? 203 : 405);
+		const scrollHeight = ref(isMobile ? "h-[500vh]" : "h-[1000vh]");
 
 		let isScrollingTimerId;
 		const isScrolling = ref(false);
@@ -134,6 +146,7 @@ export default {
 			videoFrameW,
 			videoFrameH,
 			isScrolling,
+			scrollHeight,
 		};
 	},
 };
@@ -148,5 +161,9 @@ export default {
 .v-enter-from,
 .v-leave-to {
 	opacity: 0;
+}
+
+.contain-layout {
+	contain: layout style;
 }
 </style>

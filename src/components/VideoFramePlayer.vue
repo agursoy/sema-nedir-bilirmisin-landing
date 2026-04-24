@@ -7,114 +7,150 @@
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, watch } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
 export default {
 	emits: ["preload-completed"],
 	expose: ["updateFrame"],
 	props: ["canvas_w", "canvas_h"],
 	setup(props, { emit }) {
+		const isMobile =
+			/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+			window.innerWidth < 768;
+
 		// ---------- CONFIG ----------
 		const TOTAL_FRAMES = 720;
 		const INITIAL_PRELOAD = 500;
+		const REMAINING_DELAY = isMobile ? 80 : 50;
 		const FRAME_PATH = (i) =>
 			`/frames/frame_${String(i).padStart(3, "0")}.webp`;
 
-		const { canvas_w, canvas_h } = props;
+		const canvasW = props.canvas_w;
+		const canvasH = props.canvas_h;
 
 		// ---------- STATE ----------
 		const canvas = ref(null);
-		const ctx = ref(null);
-		const images = [];
-		const loaded = new Array(TOTAL_FRAMES + 1).fill(false);
-
-
+		let ctx = null;
+		const bitmaps = new Array(TOTAL_FRAMES + 1).fill(null);
 
 		let lastRenderedFrame = -1;
+		let pendingFrame = -1;
+		let rafDrawId = null;
 
-		// ---------- HELPERS ----------
-		function pad(n) {
-			return String(n).padStart(3, "0");
+		// createImageBitmap desteğini bir kez kontrol et
+		let bitmapSupported = typeof createImageBitmap === "function";
+
+		// ---------- SINGLE IMAGE LOADER ----------
+		async function preloadImage(index) {
+			if (bitmaps[index]) return;
+
+			try {
+				const res = await fetch(FRAME_PATH(index));
+				if (!res.ok) return;
+				const blob = await res.blob();
+
+				if (bitmapSupported) {
+					try {
+						bitmaps[index] = await createImageBitmap(blob);
+						return;
+					} catch {
+						bitmapSupported = false; // bir kez başarısız olursa sonraki için devre dışı
+					}
+				}
+
+				// Fallback: klasik Image
+				const img = new Image();
+				const url = URL.createObjectURL(blob);
+				img.src = url;
+				await new Promise((resolve) => {
+					img.onload = () => { URL.revokeObjectURL(url); resolve(); };
+					img.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+				});
+				bitmaps[index] = img;
+			} catch {
+				// Sessizce geç
+			}
 		}
 
-		function preloadImage(index) {
-			return new Promise((resolve) => {
-				if (!images[index]) images[index] = new Image();
-				images[index].src = FRAME_PATH(index);
-				images[index].decoding = "async";
-				images[index].loading = "eager";
-				images[index].onload = () => {
-					loaded[index] = true;
-					resolve(images[index]);
-				};
-				images[index].onerror = () => resolve(null);
-			});
-		}
-
-		async function preloadInitial() {
+		async function preloadRange(start, end) {
 			const promises = [];
-			for (let i = 1; i <= Math.min(INITIAL_PRELOAD, TOTAL_FRAMES); i++) {
+			for (let i = start; i <= Math.min(end, TOTAL_FRAMES); i++) {
 				promises.push(preloadImage(i));
 			}
-			return await Promise.all(promises);
+			await Promise.all(promises);
 		}
 
 		function preloadRemaining() {
-			setTimeout(async () => {
+			const startRemaining = async () => {
 				for (let i = INITIAL_PRELOAD + 1; i <= TOTAL_FRAMES; i++) {
 					await preloadImage(i);
-					await new Promise((r) => setTimeout(r, 50));
+					// Her frame arasında küçük gecikme — CPU'yu boğmaz
+					if (i % 10 === 0) {
+						await new Promise((r) => setTimeout(r, REMAINING_DELAY));
+					}
 				}
-			}, 500);
-		}
+			};
 
-		function drawFrame(index) {
-			if (!ctx.value) return;
-			const img = images[index];
-			ctx.value.clearRect(0, 0, canvas_w, canvas_h);
-
-			if (img && loaded[index]) {
-				const iw = img.width;
-				const ih = img.height;
-				const canvasRatio = canvas_w / canvas_h;
-				const imgRatio = iw / ih;
-
-				let dw = canvas_w;
-				let dh = canvas_h;
-				let dx = 0;
-				let dy = 0;
-
-				if (imgRatio > canvasRatio) {
-					dh = canvas_h;
-					dw = (iw / ih) * dh;
-					dx = -(dw - canvas_w) / 2;
-				} else {
-					dw = canvas_w;
-					dh = (ih / iw) * dw;
-					dy = -(dh - canvas_h) / 2;
-				}
-
-				ctx.value.drawImage(img, dx, dy, dw, dh);
+			if (typeof requestIdleCallback === "function") {
+				requestIdleCallback(() => startRemaining(), { timeout: 2000 });
 			} else {
-				ctx.value.fillStyle = "#111";
-				ctx.value.fillRect(0, 0, canvas_w, canvas_h);
-				ctx.value.fillStyle = "#999";
-				ctx.value.font = "16px sans-serif";
-				ctx.value.fillText(`frame ${pad(index)} not loaded`, 20, 40);
+				setTimeout(startRemaining, 500);
 			}
 		}
 
-		// ---------- FRAME UPDATE ----------
+		// ---------- DRAW ----------
+		function drawFrame(index) {
+			if (!ctx) return;
+			const bmp = bitmaps[index];
+			ctx.clearRect(0, 0, canvasW, canvasH);
+
+			if (bmp) {
+				const iw = bmp.width;
+				const ih = bmp.height;
+				const canvasRatio = canvasW / canvasH;
+				const imgRatio = iw / ih;
+
+				let dw = canvasW, dh = canvasH, dx = 0, dy = 0;
+
+				if (imgRatio > canvasRatio) {
+					dh = canvasH;
+					dw = (iw / ih) * dh;
+					dx = -(dw - canvasW) / 2;
+				} else {
+					dw = canvasW;
+					dh = (ih / iw) * dw;
+					dy = -(dh - canvasH) / 2;
+				}
+				ctx.drawImage(bmp, dx, dy, dw, dh);
+			} else {
+				ctx.fillStyle = "#111";
+				ctx.fillRect(0, 0, canvasW, canvasH);
+				ctx.fillStyle = "#999";
+				ctx.font = "16px sans-serif";
+				ctx.fillText(`frame ${String(index).padStart(3, "0")} yükleniyor...`, 20, 40);
+			}
+		}
+
+		// ---------- FRAME UPDATE (rAF-coalesced) ----------
+		function scheduleDrawFrame(index) {
+			pendingFrame = index;
+			if (!rafDrawId) {
+				rafDrawId = requestAnimationFrame(() => {
+					rafDrawId = null;
+					if (pendingFrame !== lastRenderedFrame) {
+						drawFrame(pendingFrame);
+						lastRenderedFrame = pendingFrame;
+					}
+				});
+			}
+		}
+
 		function updateFrame(scrollPercent) {
 			const frameIndex = Math.min(
 				TOTAL_FRAMES,
 				Math.max(1, Math.floor(scrollPercent * TOTAL_FRAMES) + 1),
 			);
-
-			if (frameIndex !== lastRenderedFrame) {
-				drawFrame(frameIndex);
-				lastRenderedFrame = frameIndex;
-			}
+			scheduleDrawFrame(frameIndex);
 		}
 
 		onMounted(async () => {
@@ -122,17 +158,21 @@ export default {
 			document.documentElement.style.overflow = "hidden";
 
 			const el = canvas.value;
-			el.width = canvas_w;
-			el.height = canvas_h;
-			ctx.value = el.getContext("2d");
+			el.width = canvasW;
+			el.height = canvasH;
+			ctx = el.getContext("2d");
 
-			await preloadInitial();
+			// İlk frame'i çiz ki canvas boş görünmesin
+			ctx.fillStyle = "#111";
+			ctx.fillRect(0, 0, canvasW, canvasH);
+
+			await preloadRange(1, INITIAL_PRELOAD);
 			preloadRemaining();
 
 			drawFrame(1);
 			lastRenderedFrame = 1;
 
-			setTimeout(function () {
+			setTimeout(() => {
 				emit("preload-completed");
 			}, 6000);
 		});
@@ -140,12 +180,15 @@ export default {
 		onBeforeUnmount(() => {
 			document.body.style.overflow = "";
 			document.documentElement.style.overflow = "";
+
+			if (rafDrawId) cancelAnimationFrame(rafDrawId);
+
+			bitmaps.forEach((bmp) => {
+				if (bmp && typeof bmp.close === "function") bmp.close();
+			});
 		});
 
-		return {
-			canvas,
-			updateFrame,
-		};
+		return { canvas, updateFrame };
 	},
 };
 </script>
@@ -161,5 +204,6 @@ export default {
 .video-canvas {
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 	background: #000;
+	/* contain: strict kaldırıldı — canvas'ı görünmez yapıyordu */
 }
 </style>

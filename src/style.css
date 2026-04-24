@@ -1,8 +1,37 @@
 @import "tailwindcss";
 
-/* Tüm body’ye Helvetica / Arial fontu uygula */
+/* Tüm body'ye Helvetica / Arial fontu uygula */
 body * {
 	font-family: "Helvetica", Helvetica, Arial, sans-serif;
+}
+
+/* Mobil performans optimizasyonları */
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
+body {
+	/* Overscroll davranışını kontrol et — mobilde bounce'u engeller */
+	overscroll-behavior: none;
+	/* Touch action — tarayıcıya yalnızca dikey scroll olduğunu bildir */
+	touch-action: pan-y;
+	/* Font rendering optimizasyonu */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeSpeed;
+}
+
+/* Scroll container performans izolasyonu */
+.scroll-container {
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	contain: layout style;
+}
+
+/* GPU-accelerated transforms için 3D hint */
+.sticky {
+	transform: translateZ(0);
 }
 
 @theme {
