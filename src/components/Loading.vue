@@ -12,22 +12,22 @@
 
 		<div
 			ref="title"
-			class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-extrablack"
+			class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-extrablack w-full flex justify-center items-center pointer-events-none"
 		>
 			<div
-				class="text-snb-text-default rounded-[12px] w-96 text-8xl whitespace-wrap ml-12"
+				class="text-snb-text-default rounded-[12px] w-[90vw] md:w-96 text-5xl md:text-8xl whitespace-wrap text-center md:text-left md:ml-12"
 			>
 				sema nedir bilir misin?
 			</div>
 		</div>
 	</div>
 	<div
-		class="bg-gray-900/70 px-4 py-1 rounded-full text-1xl font-clean text-snb-text-default fixed bottom-6 right-5"
+		class="bg-gray-900/70 px-4 md:px-6 py-1.5 md:py-2 rounded-full text-base md:text-lg font-clean text-snb-text-default fixed bottom-21 md:bottom-3 left-1/2 -translate-x-1/2 md:left-auto md:right-8 md:translate-x-0 z-50"
 		ref="loadingText"
 	>
-		<div class="flex flex-row items-center justify-center gap-1">
-			<img class="h-8 w-8" ref="iris" src="/iris.webp" />
-			<span>yükleniyor..</span>
+		<div class="flex flex-row items-center justify-center gap-2">
+			<img class="h-6 w-6 md:h-8 md:w-8" ref="iris" src="/iris.webp" />
+			<span class="whitespace-nowrap">yükleniyor..</span>
 		</div>
 	</div>
 </template>
@@ -54,6 +54,7 @@ export default {
 		const { videoFrameW, videoFrameH } = props;
 
 		onMounted(async () => {
+			const isMobile = window.innerWidth < 768;
 			const { chars } = splitText(title.value, {
 				chars: { class: "char opacity-0", clone: "top", wrap: "clip" },
 			});
@@ -62,7 +63,8 @@ export default {
 			createTimeline({ delay: 2500 })
 				.add(title.value, {
 					ease: "inOut(1.9)",
-					x: "22vw",
+					x: isMobile ? 0 : "22vw",
+					y: isMobile ? "12vh" : 0,
 				})
 				.add(chars, {
 					opacity: [0, 1],
@@ -78,8 +80,9 @@ export default {
 			animate(image.value, {
 				delay: 3000,
 				ease: "inOut(1.9)",
-				x: "-18vw",
-				scale: [1, 2],
+				x: isMobile ? 0 : "-18vw",
+				y: isMobile ? "-12vh" : 0,
+				scale: isMobile ? [1, 1.3] : [1, 2],
 			});
 
 			animate(iris.value, {
