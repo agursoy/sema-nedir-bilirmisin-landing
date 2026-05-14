@@ -20,7 +20,7 @@
 						<div
 							class="flex flex-col md:flex-row flex-wrap gap-4 md:gap-12 justify-center items-center"
 						>
-							<div id="video">
+							<div id="video" :style="videoSplitStyle">
 								<video-frame-player
 									:canvas_w="videoFrameW"
 									:canvas_h="videoFrameH"
@@ -31,6 +31,7 @@
 							<div
 								id="text"
 								class="w-full md:w-96 relative md:-mt-0 md:ml-0 p-5 contain-layout"
+								:style="textSplitStyle"
 							>
 								<div class="relative">
 									<h1
@@ -58,14 +59,17 @@
 				</div>
 			</div>
 		</Transition>
+		<ticket-modal :progress="splitProgress" />
 	</div>
 </template>
 
 <script>
 import { useScrollTimeline } from "./composables/useScrollTimeline.js";
+import { useSplitAnimation } from "./composables/useSplitAnimation.js";
 import VideoFramePlayer from "./components/VideoFramePlayer.vue";
 import ScrollDownMessageBar from "./components/ScrollDownMessageBar.vue";
 import Loading from "./components/Loading.vue";
+import TicketModal from "./components/TicketModal.vue";
 
 import { watch, ref } from "vue";
 
@@ -74,6 +78,7 @@ export default {
 		VideoFramePlayer,
 		Loading,
 		ScrollDownMessageBar,
+		TicketModal,
 	},
 	setup() {
 		const videoFramePlayer = ref(null);
@@ -119,6 +124,9 @@ export default {
 			currentProgress,
 		} = useScrollTimeline(scenes);
 
+		const { splitProgress, videoSplitStyle, textSplitStyle } =
+			useSplitAnimation(currentProgress, isMobile);
+
 		watch(currentProgress, (val) => {
 			updateIsScrolling();
 
@@ -147,6 +155,9 @@ export default {
 			videoFrameH,
 			isScrolling,
 			scrollHeight,
+			splitProgress,
+			videoSplitStyle,
+			textSplitStyle,
 		};
 	},
 };
