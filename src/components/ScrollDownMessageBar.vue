@@ -18,6 +18,7 @@ import { animate } from "animejs";
 export default {
 	props: {
 		isScrolling: Boolean,
+		isFinished: Boolean,
 	},
 	components: {
 		ScrollDownIcon,
@@ -39,9 +40,11 @@ export default {
 			animation.play();
 
 			watch(
-				() => props.isScrolling,
-				(val) => {
-					if (val) {
+				() => [props.isScrolling, props.isFinished],
+				([isScrolling, isFinished]) => {
+					if (isFinished) {
+						show.value = false;
+					} else if (isScrolling) {
 						show.value = false;
 					} else {
 						animation.restart();

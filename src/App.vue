@@ -50,6 +50,7 @@
 								</div>
 								<scroll-down-message-bar
 									:isScrolling="isScrolling"
+									:isFinished="currentProgress >= 0.90"
 								></scroll-down-message-bar>
 							</div>
 						</div>
