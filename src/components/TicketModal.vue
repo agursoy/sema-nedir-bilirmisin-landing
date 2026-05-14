@@ -19,11 +19,13 @@
 			</p>
 			<div class="flex flex-col gap-4 mt-4 w-full">
 				<a
-					href="https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm"
+					v-for="(ticket, index) in tickets"
+					:key="index"
+					:href="ticket.url"
 					target="_blank"
-					class="w-full text-center bg-snb-text-default text-snb-bg-default px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform"
+					class="w-full text-center bg-snb-text-default text-snb-bg-default px-8 py-4 rounded-full font-bold text-base md:text-xl hover:scale-105 transition-transform"
 				>
-					7 Ocak 2026 - AKM Bilet Al
+					{{ ticket.label }}
 				</a>
 			</div>
 		</div>
@@ -34,6 +36,10 @@
 export default {
 	props: {
 		progress: Number,
+		tickets: {
+			type: Array,
+			default: () => [],
+		},
 	},
 };
 </script>

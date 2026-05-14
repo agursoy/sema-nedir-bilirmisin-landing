@@ -55,7 +55,7 @@
 								></scroll-down-message-bar>
 							</div>
 						</div>
-						<ticket-modal :progress="splitProgress" />
+						<ticket-modal :progress="splitProgress" :tickets="tickets" />
 					</div>
 				</div>
 			</div>
@@ -94,6 +94,17 @@ export default {
 
 		let isScrollingTimerId;
 		const isScrolling = ref(false);
+
+		const tickets = [
+			{
+				label: "20 Mayıs 2026 Çarşamba 19:30 - AKM Bilet Al",
+				url: "https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm"
+			},
+			{
+				label: "17 Haziran 2026 Çarşamba 19:30 - AKM Bilet Al",
+				url: "https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm"
+			}
+		];
 
 		const scenes = [
 			{
@@ -158,6 +169,7 @@ export default {
 			splitProgress,
 			videoSplitStyle,
 			textSplitStyle,
+			tickets,
 		};
 	},
 };
