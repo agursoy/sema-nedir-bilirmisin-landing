@@ -2,7 +2,7 @@
 	<div
 		v-show="show"
 		ref="scrollDownMessage"
-		class="absolute bottom-5 flex flex-row items-center gap-3"
+		class="absolute bottom-0 flex flex-row items-center gap-3"
 	>
 		<span id="scroll-message" class="text-snb-text-default"
 			>Sayfayı kaydırmaya devam edin</span

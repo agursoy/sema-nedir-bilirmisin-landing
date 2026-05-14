@@ -78,7 +78,6 @@ export default {
 		const videoFramePlayer = ref(null);
 		const loading = ref(true);
 
-		// isMobile'ı hemen hesapla — computed/onMounted timing sorunu yaratmaz
 		const isMobile =
 			/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
 			window.innerWidth < 768;
