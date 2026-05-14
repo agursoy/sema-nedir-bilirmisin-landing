@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="fixed inset-0 flex flex-col items-center justify-center z-[60] pointer-events-none"
+		class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center z-[60] pointer-events-none w-full"
 		v-show="progress > 0"
 	>
 		<div

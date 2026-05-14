@@ -55,11 +55,11 @@
 								></scroll-down-message-bar>
 							</div>
 						</div>
+						<ticket-modal :progress="splitProgress" />
 					</div>
 				</div>
 			</div>
 		</Transition>
-		<ticket-modal :progress="splitProgress" />
 	</div>
 </template>
 
