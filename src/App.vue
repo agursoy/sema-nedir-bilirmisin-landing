@@ -1,5 +1,18 @@
 <template>
 	<div class="bg-snb-bg-default">
+		<!-- Tam ekran arka plan video oynatıcı — scroll container DIŞINDA -->
+		<video-frame-player
+			:canvas_w="videoFrameW"
+			:canvas_h="videoFrameH"
+			ref="videoFramePlayer"
+			@preload-completed="loading = false"
+		/>
+		<!-- Renk overlay — scroll container DIŞINDA -->
+		<div
+			ref="bgRef"
+			class="fixed top-0 left-0 w-full h-full pointer-events-none z-10"
+			:style="currentStyle"
+		></div>
 		<Transition>
 			<div v-show="loading">
 				<loading :video-frame-w="videoFrameW" :video-frame-h="videoFrameH" />
@@ -8,29 +21,16 @@
 		<Transition>
 			<div
 				v-show="!loading"
-				class="scroll-container h-screen overflow-y-scroll"
+				class="scroll-container h-screen overflow-y-scroll relative z-20"
 			>
-				<div
-					ref="bgRef"
-					class="fixed top-0 left-0 w-full h-full pointer-events-none z-30"
-					:style="currentStyle"
-				></div>
 				<div class="relative" :class="scrollHeight">
 					<div class="sticky top-1/2 -translate-y-1/2 w-full">
 						<div
-							class="flex flex-col md:flex-row flex-wrap gap-4 md:gap-12 justify-center items-center"
+							class="flex flex-col justify-center items-center"
 						>
-							<div id="video" :style="videoSplitStyle">
-								<video-frame-player
-									:canvas_w="videoFrameW"
-									:canvas_h="videoFrameH"
-									ref="videoFramePlayer"
-									@preload-completed="loading = false"
-								/>
-							</div>
 							<div
 								id="text"
-								class="w-full md:w-96 relative md:-mt-0 md:ml-0 p-5 contain-layout"
+								class="w-full md:w-2/3 lg:w-1/2 relative p-5 md:p-12 contain-layout"
 								:style="textSplitStyle"
 							>
 								<div class="relative">
