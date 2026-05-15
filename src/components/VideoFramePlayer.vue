@@ -1,6 +1,7 @@
 <template>
 	<div class="frame-player-container">
 		<canvas ref="canvas" class="video-canvas"></canvas>
+		<div class="bg-black/30 h-full w-full fixed"></div>
 	</div>
 </template>
 
