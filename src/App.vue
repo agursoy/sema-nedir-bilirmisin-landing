@@ -1,61 +1,55 @@
 <template>
 	<div class="bg-snb-bg-default">
 		<!-- Tam ekran arka plan video oynatıcı — scroll container DIŞINDA -->
-		<video-frame-player
-			:canvas_w="videoFrameW"
-			:canvas_h="videoFrameH"
-			ref="videoFramePlayer"
-			@preload-completed="loading = false"
-		/>
-		<!-- Renk overlay — scroll container DIŞINDA -->
-		<div
-			ref="bgRef"
-			class="fixed top-0 left-0 w-full h-full pointer-events-none z-10"
-			:style="currentStyle"
-		></div>
+
 		<Transition>
 			<div v-show="loading">
 				<loading :video-frame-w="videoFrameW" :video-frame-h="videoFrameH" />
 			</div>
 		</Transition>
 		<Transition>
-			<div
-				v-show="!loading"
-				class="scroll-container h-screen overflow-y-scroll relative z-20"
-			>
-				<div class="relative" :class="scrollHeight">
-					<div class="sticky top-1/2 -translate-y-1/2 w-full">
-						<div
-							class="flex flex-col justify-center items-center"
-						>
-							<div
-								id="text"
-								class="w-full md:w-2/3 lg:w-1/2 relative p-5 md:p-12 contain-layout"
-								:style="textSplitStyle"
-							>
-								<div class="relative">
-									<h1
-										:id="`header-${currentIndex}`"
-										:class="`header-${currentIndex}`"
-										class="text-lg md:text-5xl text-snb-text-default font-clean"
-									>
-										{{ currentHeader }}
-									</h1>
-									<h2
-										:id="`paragraph-${currentIndex}`"
-										:class="`paragraph-${currentIndex}`"
-										class="text-md md:text-xl text-snb-text-default font-clean pt-6"
-									>
-										{{ currentParagraph }}
-									</h2>
+			<div v-show="!loading">
+				<video-frame-player
+					v-show="!loading"
+					:canvas_w="videoFrameW"
+					:canvas_h="videoFrameH"
+					ref="videoFramePlayer"
+					@preload-completed="loading = false"
+				/>
+
+				<div class="scroll-container h-screen overflow-y-scroll relative z-20">
+					<div class="relative" :class="scrollHeight">
+						<div class="sticky top-1/2 -translate-y-1/2 w-full">
+							<div class="flex flex-col gap-5 justify-center items-center">
+								<div
+									id="text"
+									class="w-full md:w-2/3 lg:w-1/2 relative p-5 md:p-12 pb-14 contain-layout"
+									:style="textSplitStyle"
+								>
+									<div class="relative">
+										<h1
+											:id="`header-${currentIndex}`"
+											:class="`header-${currentIndex}`"
+											class="text-lg md:text-5xl text-snb-text-default font-clean"
+										>
+											{{ currentHeader }}
+										</h1>
+										<h2
+											:id="`paragraph-${currentIndex}`"
+											:class="`paragraph-${currentIndex}`"
+											class="text-md md:text-xl text-snb-text-default font-clean pt-6"
+										>
+											{{ currentParagraph }}
+										</h2>
+									</div>
+									<scroll-down-message-bar
+										:isScrolling="isScrolling"
+										:isFinished="currentProgress >= 0.9"
+									></scroll-down-message-bar>
 								</div>
-								<scroll-down-message-bar
-									:isScrolling="isScrolling"
-									:isFinished="currentProgress >= 0.9"
-								></scroll-down-message-bar>
 							</div>
+							<ticket-modal :progress="splitProgress" :tickets="tickets" />
 						</div>
-						<ticket-modal :progress="splitProgress" :tickets="tickets" />
 					</div>
 				</div>
 			</div>
@@ -178,7 +172,7 @@ export default {
 <style>
 .v-enter-active,
 .v-leave-active {
-	transition: opacity 3s ease;
+	transition: opacity 1s ease;
 }
 
 .v-enter-from,
