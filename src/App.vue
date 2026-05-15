@@ -51,7 +51,7 @@
 								</div>
 								<scroll-down-message-bar
 									:isScrolling="isScrolling"
-									:isFinished="currentProgress >= 0.90"
+									:isFinished="currentProgress >= 0.9"
 								></scroll-down-message-bar>
 							</div>
 						</div>
@@ -98,12 +98,12 @@ export default {
 		const tickets = [
 			{
 				label: "20 Mayıs 2026 Çarşamba 19:30 - AKM Bilet Al",
-				url: "https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm"
+				url: "https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm",
 			},
 			{
 				label: "17 Haziran 2026 Çarşamba 19:30 - AKM Bilet Al",
-				url: "https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm"
-			}
+				url: "https://biletinial.com/tr-tr/muzik/sema-nedir-bilir-misin-sema-mukabelesi-deneyimi-akm",
+			},
 		];
 
 		const scenes = [

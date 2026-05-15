@@ -1,5 +1,5 @@
 <template>
-	<div class="frame-player-container border-1 border-[#eceee2]/50">
+	<div class="frame-player-container">
 		<div class="left-column">
 			<canvas ref="canvas" class="video-canvas w-full h-auto"></canvas>
 		</div>
@@ -63,8 +63,14 @@ export default {
 				const url = URL.createObjectURL(blob);
 				img.src = url;
 				await new Promise((resolve) => {
-					img.onload = () => { URL.revokeObjectURL(url); resolve(); };
-					img.onerror = () => { URL.revokeObjectURL(url); resolve(); };
+					img.onload = () => {
+						URL.revokeObjectURL(url);
+						resolve();
+					};
+					img.onerror = () => {
+						URL.revokeObjectURL(url);
+						resolve();
+					};
 				});
 				bitmaps[index] = img;
 			} catch {
@@ -110,7 +116,10 @@ export default {
 				const canvasRatio = canvasW / canvasH;
 				const imgRatio = iw / ih;
 
-				let dw = canvasW, dh = canvasH, dx = 0, dy = 0;
+				let dw = canvasW,
+					dh = canvasH,
+					dx = 0,
+					dy = 0;
 
 				if (imgRatio > canvasRatio) {
 					dh = canvasH;
@@ -127,7 +136,11 @@ export default {
 				ctx.fillRect(0, 0, canvasW, canvasH);
 				ctx.fillStyle = "#999";
 				ctx.font = "16px sans-serif";
-				ctx.fillText(`frame ${String(index).padStart(3, "0")} yükleniyor...`, 20, 40);
+				ctx.fillText(
+					`frame ${String(index).padStart(3, "0")} yükleniyor...`,
+					20,
+					40,
+				);
 			}
 		}
 

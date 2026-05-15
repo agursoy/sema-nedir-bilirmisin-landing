@@ -7,7 +7,7 @@
 				width: `${Math.round(videoFrameW / 2)}px`,
 				height: `${Math.round(videoFrameH / 2)}px`,
 			}"
-			class="border-1 border-[#eceee2]/50 bg-[url(/frames/frame_001.webp)] bg-cover bg-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-xs hover:bg-neutral-secondary-medium"
+			class="bg-[url(/frames/frame_001.webp)] bg-cover bg-center fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-xs hover:bg-neutral-secondary-medium"
 		></div>
 
 		<div
@@ -73,7 +73,7 @@ export default {
 				.add(
 					".char > span",
 					{ y: "100%", composition: "blend", ease, loop: true },
-					stagger(10, { use: "data-char", from: "random" })
+					stagger(10, { use: "data-char", from: "random" }),
 				)
 				.init();
 
